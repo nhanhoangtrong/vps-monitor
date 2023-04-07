@@ -7,6 +7,8 @@ import (
 	human "github.com/dustin/go-humanize"
 	"github.com/gin-gonic/gin"
 	"github.com/shirou/gopsutil/disk"
+
+	"github.com/pbnjay/memory"
 )
 
 func printUsage() ([]string, error) {
@@ -43,7 +45,7 @@ func printUsage() ([]string, error) {
 }
 
 func main() {
-	// Initialize gin
+	// Initialize gin with default
 	r := gin.Default()
 	r.LoadHTMLGlob("templates/*")
 
@@ -59,6 +61,11 @@ func main() {
 		c.HTML(http.StatusOK, "disk.html", gin.H{
 			"usages": usages,
 		})
+	})
+
+	// Get RAM info
+	r.GET("/ram", func(c *gin.Context) {
+		c.String(http.StatusOK, fmt.Sprintf("Total system memory: %s/%s\n", human.Bytes(memory.FreeMemory()), human.Bytes(memory.TotalMemory())))
 	})
 
 	r.Run()
